@@ -2,12 +2,10 @@ package leagueshare.imgurservice.controllers;
 
 import leagueshare.imgurservice.entities.Imgur;
 import leagueshare.imgurservice.repo.ImgurRepo;
+import leagueshare.imgurservice.rmq.MessagingConfig;
 import okhttp3.RequestBody;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,18 +24,27 @@ public class ImgurController {
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final String urlUpload = "https://api.imgur.com/3/upload";
-    private String pathToFile = "src/main/TemporaryFiles/";
-    private ImgurRepo imgurRepo;
+    private final String pathToFile = "src/main/TemporaryFiles/";
 
+    private final ImgurRepo imgurRepo;
+    private final MessagingConfig msgConfig;
 
 
     @Autowired
-    public ImgurController(ImgurRepo imgurRepo) {
+    public ImgurController(ImgurRepo imgurRepo, MessagingConfig msgConfig) {
         this.imgurRepo = imgurRepo;
+        this.msgConfig = msgConfig;
+    }
+
+    @RabbitListener(queues = "user-queue")
+    public void receiveMsg(String message){
+        get(message);
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> get() {
+    public ResponseEntity<?> get(String message) {
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + message);
+
         Imgur imgur = new Imgur("link1","deletehash1");
         imgurRepo.save(imgur);
         return new ResponseEntity<>(imgur, HttpStatus.OK);
