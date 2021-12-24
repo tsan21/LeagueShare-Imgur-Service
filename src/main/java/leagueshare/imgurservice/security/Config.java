@@ -44,7 +44,6 @@ public class Config extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.authorizeRequests()
-                .antMatchers("/keycloak/user").hasRole("user")
                 .antMatchers("/keycloak/admin").hasRole("admin")
                 .anyRequest()
                 .permitAll();
