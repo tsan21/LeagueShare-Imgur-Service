@@ -34,7 +34,7 @@ public class ImgurController {
 
     @GetMapping("/")
     public ResponseEntity<?> get() {
-        Imgur imgur = new Imgur("link1","deletehash1");
+        Imgur imgur = new Imgur("link2","deletehash2");
         imgurRepo.save(imgur);
         return new ResponseEntity<>(imgur, HttpStatus.OK);
     }
